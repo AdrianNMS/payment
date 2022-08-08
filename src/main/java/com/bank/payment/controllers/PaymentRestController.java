@@ -22,35 +22,41 @@ public class PaymentRestController
     @GetMapping
     public Mono<ResponseEntity<Object>> findAll()
     {
+        log.info("[INI] findAll Payment");
         return dao.findAll()
                 .doOnNext(payment -> log.info(payment.toString()))
                 .collectList()
                 .map(payments -> ResponseHandler.response("Done", HttpStatus.OK, payments))
-                .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)));
+                .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)))
+                .doFinally(fin -> log.info("[END] findAll Payment"));
     }
 
     @GetMapping("/{id}")
     public Mono<ResponseEntity<Object>> find(@PathVariable String id)
     {
+        log.info("[INI] find Payment");
         return dao.findById(id)
                 .doOnNext(payment -> log.info(payment.toString()))
                 .map(payment -> ResponseHandler.response("Done", HttpStatus.OK, payment))
-                .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)));
+                .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)))
+                .doFinally(fin -> log.info("[END] find Payment"));
     }
 
     @PostMapping
     public Mono<ResponseEntity<Object>> create(@RequestBody Payment pay)
     {
-
+        log.info("[INI] create Payment");
         return dao.save(pay)
                 .doOnNext(payment -> log.info(payment.toString()))
                 .map(payment -> ResponseHandler.response("Done", HttpStatus.OK, payment)                )
-                .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)));
+                .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)))
+                .doFinally(fin -> log.info("[END] create Payment"));
     }
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<Object>> update(@PathVariable("id") String id, @RequestBody Payment pay)
     {
+        log.info("[INI] update Payment");
         return dao.existsById(id).flatMap(check -> {
             if (check)
                 return dao.save(pay)
@@ -60,12 +66,13 @@ public class PaymentRestController
             else
                 return Mono.just(ResponseHandler.response("Not found", HttpStatus.NOT_FOUND, null));
 
-        });
+        }).doFinally(fin -> log.info("[END] update Payment"));
     }
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Object>> delete(@PathVariable("id") String id)
     {
+        log.info("[INI] delete Payment");
         log.info(id);
 
         return dao.existsById(id).flatMap(check -> {
@@ -73,6 +80,6 @@ public class PaymentRestController
                 return dao.deleteById(id).then(Mono.just(ResponseHandler.response("Done", HttpStatus.OK, null)));
             else
                 return Mono.just(ResponseHandler.response("Not found", HttpStatus.NOT_FOUND, null));
-        });
+        }).doFinally(fin -> log.info("[END] delete Payment"));
     }
 }
