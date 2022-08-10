@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentRestController
@@ -43,7 +45,7 @@ public class PaymentRestController
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Object>> create(@RequestBody Payment pay)
+    public Mono<ResponseEntity<Object>> create(@Valid @RequestBody Payment pay)
     {
         log.info("[INI] create Payment");
         return dao.save(pay)
