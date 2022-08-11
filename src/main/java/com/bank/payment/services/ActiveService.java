@@ -1,10 +1,8 @@
 package com.bank.payment.services;
 
-import com.bank.payment.models.utils.ResponseService;
+import com.bank.payment.models.utils.ResponseActive;
 import reactor.core.publisher.Mono;
 
-
 public interface ActiveService {
-
-    Mono<ResponseService> findByCode(String id);
+    Mono<ResponseActive> findByCode(String id);
 }
