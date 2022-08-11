@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
@@ -85,7 +86,7 @@ public class PaymentRestController
                                 if(!finalTypeName.equals(responseClient.getData().getType())){
                                     return Mono.just(ResponseHandler.response("The Active is not enabled for the client", HttpStatus.BAD_REQUEST, null));
                                 }
-
+                                pay.setDateRegister(LocalDateTime.now());
                                 return dao.save(pay)
                                         .doOnNext(transaction -> log.info(transaction.toString()))
                                         .map(transaction -> ResponseHandler.response("Done", HttpStatus.OK, transaction)                )
@@ -105,11 +106,13 @@ public class PaymentRestController
     {
         log.info("[INI] update Payment");
         return dao.existsById(id).flatMap(check -> {
-            if (check)
+            if (check){
+                pay.setDateUpdate(LocalDateTime.now());
                 return dao.save(pay)
                         .doOnNext(payment -> log.info(payment.toString()))
                         .map(payment -> ResponseHandler.response("Done", HttpStatus.OK, payment)                )
                         .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)));
+            }
             else
                 return Mono.just(ResponseHandler.response("Not found", HttpStatus.NOT_FOUND, null));
 
