@@ -1,5 +1,7 @@
 package com.bank.payment.services.impl;
 
+import com.bank.payment.Mont;
+import com.bank.payment.ResponseMont;
 import com.bank.payment.models.utils.ResponseActive;
 import com.bank.payment.services.ActiveService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,23 @@ public class ActiveImpl implements ActiveService {
                 .uri("/api/active/"+ id)
                 .retrieve()
                 .bodyToMono(ResponseActive.class);
+    }
+
+    @Override
+    public Mono<ResponseMont> getMont(String idActive, String idCredit) {
+        return webClient.get()
+                .uri("/api/active/mont/"+ idActive+"/"+idCredit)
+                .retrieve()
+                .bodyToMono(ResponseMont.class);
+    }
+
+    @Override
+    public Mono<ResponseMont> setMont(String idActive, String idCredit, Mont mont) {
+        return webClient.post()
+                .uri("/api/active/mont/"+ idActive+"/"+idCredit)
+                .body(Mono.just(mont), Mont.class)
+                .retrieve()
+                .bodyToMono(ResponseMont.class);
     }
 
 }
