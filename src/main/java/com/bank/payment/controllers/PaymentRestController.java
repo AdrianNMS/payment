@@ -1,6 +1,6 @@
 package com.bank.payment.controllers;
 
-import com.bank.payment.Mont;
+import com.bank.payment.models.utils.Mont;
 import com.bank.payment.handler.ResponseHandler;
 import com.bank.payment.models.dao.PaymentDao;
 import com.bank.payment.models.documents.Payment;

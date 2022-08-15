@@ -1,4 +1,4 @@
-package com.bank.payment;
+package com.bank.payment.models.utils;
 
 import lombok.Data;
 
