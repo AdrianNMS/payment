@@ -22,5 +22,6 @@ public class Payment extends Audit
     private String creditId;
     @NotNull(message = "mont must not be null")
     private Float mont;
+    @NotNull(message = "typePayment must not be null")
     private TypePayment typePayment;
 }

@@ -26,7 +26,7 @@ public class PaymentRestControllerUpdate
 
     public static Mono<ResponseEntity<Object>> CheckDebt(String id, Payment pay, Logger log, PaymentService paymentService, Mont mont, Payment oldPayment)
     {
-        return paymentService.getDebtMonth(pay.getActiveId(), pay.getCreditId())
+        return paymentService.getDebt(pay.getActiveId(), pay.getCreditId())
                 .flatMap(debt -> {
                     float currentMont = mont.getMont() - (debt + (pay.getMont() - oldPayment.getMont()));
 

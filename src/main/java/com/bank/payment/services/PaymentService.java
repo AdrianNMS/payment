@@ -14,6 +14,6 @@ public interface PaymentService
     Mono<Object> delete(String id);
     Mono<List<Payment>> findByIdClient(String id);
     Mono<Float> getBalance(String id, String idCredit);
-    Mono<Float> getDebtMonth(String id, String idCredit);
+    Mono<Float> getDebt(String id, String idCredit);
 
 }

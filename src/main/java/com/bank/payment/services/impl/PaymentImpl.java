@@ -84,15 +84,12 @@ public class PaymentImpl implements PaymentService
     }
 
     @Override
-    public Mono<Float> getDebtMonth(String id, String idCredit) {
-        LocalDateTime dateNow = LocalDateTime.now();
+    public Mono<Float> getDebt(String id, String idCredit) {
         return findAll()
                 .flatMap(payments ->
                         Mono.just((float)payments.stream()
                                 .filter(payment ->
-                                        payment.getDateRegister().getMonthValue() == dateNow.getMonthValue()
-                                                && payment.getDateRegister().getYear() == dateNow.getYear() &&
-                                                (payment.getActiveId().equals(id) && payment.getCreditId().equals(idCredit))
+                                        (payment.getActiveId().equals(id) && payment.getCreditId().equals(idCredit))
                                 )
                                 .mapToDouble(Payment::getMont)
                                 .sum()
