@@ -14,24 +14,24 @@ import java.time.LocalDateTime;
 
 public class PaymentRestControllerUpdate
 {
-    public static Mono<ResponseEntity<Object>> createPayment(Payment pay, Logger log, PaymentService paymentService)
+    public static Mono<ResponseEntity<Object>> createPayment(String id, Payment pay, Logger log, PaymentService paymentService)
     {
         pay.setDateRegister(LocalDateTime.now());
 
-        return paymentService.create(pay)
+        return paymentService.update(id, pay)
                 .doOnNext(transaction -> log.info(transaction.toString()))
                 .flatMap(transaction -> Mono.just(ResponseHandler.response("Done", HttpStatus.OK, transaction)))
                 .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)));
     }
 
-    public static Mono<ResponseEntity<Object>> CheckDebt(Payment pay, Logger log, PaymentService paymentService, Mont mont, Payment oldPayment)
+    public static Mono<ResponseEntity<Object>> CheckDebt(String id, Payment pay, Logger log, PaymentService paymentService, Mont mont, Payment oldPayment)
     {
         return paymentService.getDebtMonth(pay.getActiveId(), pay.getCreditId())
                 .flatMap(debt -> {
                     float currentMont = mont.getMont() - (debt + (pay.getMont() - oldPayment.getMont()));
 
                     if(currentMont>0)
-                        return createPayment(pay, log, paymentService);
+                        return createPayment(id, pay, log, paymentService);
                     else
                         return Mono.just(ResponseHandler.response("You don't have enough credits", HttpStatus.BAD_REQUEST, null));
                 });
@@ -42,7 +42,7 @@ public class PaymentRestControllerUpdate
         return paymentService.find(id)
                 .flatMap(payment -> {
                     if(payment!=null)
-                        return CheckDebt(pay,log,paymentService,mont,payment);
+                        return CheckDebt(id,pay,log,paymentService,mont,payment);
                     else
                         return Mono.just(ResponseHandler.response("Payment not found", HttpStatus.BAD_REQUEST, null));
                 });
