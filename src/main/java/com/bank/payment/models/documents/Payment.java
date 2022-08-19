@@ -1,5 +1,6 @@
 package com.bank.payment.models.documents;
 
+import com.bank.payment.models.enums.TypePayment;
 import com.bank.payment.models.utils.Audit;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -21,4 +22,5 @@ public class Payment extends Audit
     private String creditId;
     @NotNull(message = "mont must not be null")
     private Float mont;
+    private TypePayment typePayment;
 }
