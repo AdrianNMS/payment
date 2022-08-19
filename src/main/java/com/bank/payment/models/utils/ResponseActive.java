@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ResponseActive
 {
-    private Integer data;
+    private Boolean data;
 
     private String message;
 

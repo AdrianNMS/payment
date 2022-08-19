@@ -1,11 +1,9 @@
 package com.bank.payment.services.impl;
 
-import com.bank.payment.handler.ResponseHandler;
 import com.bank.payment.models.dao.PaymentDao;
 import com.bank.payment.models.documents.Payment;
 import com.bank.payment.services.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

@@ -1,8 +1,7 @@
 package com.bank.payment.services.impl;
 
-import com.bank.payment.models.utils.Mont;
-import com.bank.payment.models.utils.ResponseMont;
 import com.bank.payment.models.utils.ResponseActive;
+import com.bank.payment.models.utils.ResponseMont;
 import com.bank.payment.services.ActiveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,10 +18,10 @@ public class ActiveImpl implements ActiveService {
     WebClient webClient;
 
     @Override
-    public Mono<ResponseActive> findType(String id)
+    public Mono<ResponseActive> findType(Integer type,String id)
     {
         return webClient.get()
-                .uri("/api/active/type/"+ id)
+                .uri("/api/active/"+type+"/"+ id)
                 .retrieve()
                 .bodyToMono(ResponseActive.class);
     }

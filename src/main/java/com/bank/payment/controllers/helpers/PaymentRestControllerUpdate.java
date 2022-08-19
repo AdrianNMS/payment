@@ -2,7 +2,6 @@ package com.bank.payment.controllers.helpers;
 
 import com.bank.payment.handler.ResponseHandler;
 import com.bank.payment.models.documents.Payment;
-import com.bank.payment.models.enums.TypePayment;
 import com.bank.payment.models.utils.Mont;
 import com.bank.payment.services.ActiveService;
 import com.bank.payment.services.PaymentService;
@@ -62,23 +61,8 @@ public class PaymentRestControllerUpdate
                 });
     }
 
-    public static Mono<ResponseEntity<Object>> CheckActive(String id, Payment pay, Logger log, PaymentService paymentService, ActiveService activeService)
-    {
-        return activeService.findType(pay.getActiveId())
-                .flatMap(responseActive ->
-                {
-                    if(responseActive.getData()!=null)
-                    {
-                        pay.setTypePayment(TypePayment.fromInteger(responseActive.getData()));
-                        return CheckCreditMont(id, pay, log, paymentService,activeService);
-                    }
-                    else
-                        return Mono.just(ResponseHandler.response("Active Not Found", HttpStatus.BAD_REQUEST, null));
-                });
-    }
-
     public static Mono<ResponseEntity<Object>> UpdatePaymentSequence(String id, Payment pay, Logger log, PaymentService paymentService, ActiveService activeService)
     {
-        return CheckActive(id, pay, log, paymentService,activeService);
+        return CheckCreditMont(id, pay, log, paymentService,activeService);
     }
 }
