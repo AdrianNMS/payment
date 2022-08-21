@@ -14,9 +14,9 @@ public enum TypePayment
 
     public static TypePayment fromInteger(int val) {
         switch(val) {
-            case 2000:
+            case 0:
                 return PERSONAL;
-            case 2001:
+            case 1:
                 return COMPANY;
 
         }

@@ -5,6 +5,7 @@ import com.bank.payment.controllers.helpers.PaymentRestControllerUpdate;
 import com.bank.payment.handler.ResponseHandler;
 import com.bank.payment.models.documents.Payment;
 import com.bank.payment.services.ActiveService;
+import com.bank.payment.services.ClientService;
 import com.bank.payment.services.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,9 @@ public class PaymentRestController
 
     @Autowired
     private ActiveService activeService;
+
+    @Autowired
+    private ClientService clientService;
 
     @GetMapping
 
@@ -57,7 +61,7 @@ public class PaymentRestController
     {
         log.info("[INI] create payment");
 
-        return PaymentRestControllerCreate.CreatePaymentSequence(pay,log,paymentService,activeService)
+        return PaymentRestControllerCreate.CreatePaymentSequence(pay,log,paymentService,activeService,clientService)
                 .doFinally(fin -> log.info("[END] create Payment"));
     }
 
