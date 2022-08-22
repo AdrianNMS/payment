@@ -67,8 +67,12 @@ public class PaymentRestControllerCreate
         Mont mont = new Mont();
         mont.setMont(pay.getMont());
 
+        log.info(mont.toString());
+        log.info("API");
+
         return pasiveService.payWithDebitCard(pay.getDebitCardId(),mont)
                 .flatMap(responseDebitCard -> {
+                    log.info(responseDebitCard.toString());
                     if(responseDebitCard.getData())
                     {
                         return createPayment(pay, log, paymentService);
@@ -93,9 +97,16 @@ public class PaymentRestControllerCreate
                         pay.setTypePayment(TypePayment.fromInteger(responseActive.getData()));
 
                         if(pay.getDebitCardId()==null || pay.getDebitCardId().isEmpty())
+                        {
+                            log.info("Pago pasivo");
                             return getMontPasive(pay, log, pasive,paymentService);
+                        }
                         else
+                        {
+                            log.info("Pago tarjeta debito");
                             return payWithDebitCard(pay, log, pasive,paymentService);
+                        }
+
                     }
                     else
                         return Mono.just(ResponseHandler.response("Active Not Found", HttpStatus.BAD_REQUEST, null));
