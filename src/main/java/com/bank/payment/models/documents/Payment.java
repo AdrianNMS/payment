@@ -23,4 +23,7 @@ public class Payment extends Audit
     @NotNull(message = "mont must not be null")
     private Float mont;
     private TypePayment typePayment;
+
+    private String pasiveId;
+    private String debitCardId;
 }

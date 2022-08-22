@@ -27,17 +27,9 @@ public class ActiveImpl implements ActiveService {
     }
 
     @Override
-    public Mono<ResponseMont> getMont(String idActive, String idCredit) {
+    public Mono<ResponseMont> getDebt(String idActive, String idCredit) {
         return webClient.get()
-                .uri("/api/active/mont/"+ idActive+"/"+idCredit)
-                .retrieve()
-                .bodyToMono(ResponseMont.class);
-    }
-
-    @Override
-    public Mono<ResponseMont> getMontTran(String idActive, String idCredit) {
-        return webClient.get()
-                .uri("/api/active/tran/"+ idActive+"/"+idCredit)
+                .uri("/api/active/debt/"+ idActive+"/"+idCredit)
                 .retrieve()
                 .bodyToMono(ResponseMont.class);
     }

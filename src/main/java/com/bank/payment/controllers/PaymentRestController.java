@@ -1,8 +1,11 @@
 package com.bank.payment.controllers;
 
+import com.bank.payment.controllers.helpers.PaymentRestControllerCreate;
 import com.bank.payment.handler.ResponseHandler;
+import com.bank.payment.models.documents.Payment;
 import com.bank.payment.services.ActiveService;
 import com.bank.payment.services.ClientService;
+import com.bank.payment.services.PasiveService;
 import com.bank.payment.services.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -27,6 +32,8 @@ public class PaymentRestController
 
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private PasiveService pasiveService;
 
     @GetMapping
 
@@ -51,23 +58,14 @@ public class PaymentRestController
                 .doFinally(fin -> log.info("[END] find Payment"));
     }
 
-    /*@PostMapping
+    @PostMapping
     public Mono<ResponseEntity<Object>> create(@Valid @RequestBody Payment pay)
     {
         log.info("[INI] create payment");
 
-        return PaymentRestControllerCreate.CreatePaymentSequence(pay,log,paymentService,activeService,clientService)
+        return PaymentRestControllerCreate.CreatePaymentSequence(pay,log,paymentService,activeService,pasiveService)
                 .doFinally(fin -> log.info("[END] create Payment"));
-    }*/
-
-    /*@PutMapping("/{id}")
-    public Mono<ResponseEntity<Object>> update(@PathVariable("id") String id, @RequestBody Payment pay)
-    {
-        log.info("[INI] update Payment");
-
-        return PaymentRestControllerUpdate.UpdatePaymentSequence(id,pay,log,paymentService,activeService)
-                .doFinally(fin -> log.info("[END] update Payment"));
-    }*/
+    }
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Object>> delete(@PathVariable("id") String id)
