@@ -49,7 +49,8 @@ public class PaymentRestControllerCreate
                 if (dif >= 0)
                 {
                     Mont mont = new Mont();
-                    mont.setMont(pay.getMont());
+                    mont.setMont(-pay.getMont());
+                    log.info(mont.toString());
                     return setMontPasive(pay,log,pasiveService,paymentService,mont);
                 }
                 else
@@ -91,7 +92,7 @@ public class PaymentRestControllerCreate
                     {
                         pay.setTypePayment(TypePayment.fromInteger(responseActive.getData()));
 
-                        if(pay.getDebitCardId().isEmpty())
+                        if(pay.getDebitCardId()==null || pay.getDebitCardId().isEmpty())
                             return getMontPasive(pay, log, pasive,paymentService);
                         else
                             return payWithDebitCard(pay, log, pasive,paymentService);
