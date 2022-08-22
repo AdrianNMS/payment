@@ -96,13 +96,26 @@ public class PaymentRestController
     @GetMapping("/debt/{id}/{idCredit}")
     public Mono<ResponseEntity<Object>> getDebt(@PathVariable("id") String id, @PathVariable("idCredit") String idCredit)
     {
-        log.info("[INI] getBalance transaction");
+        log.info("[INI] getDebt Payment");
         log.info(id);
 
         return paymentService.getTotalBalance(id,idCredit)
                 .flatMap(balance -> Mono.just(ResponseHandler.response("Done", HttpStatus.OK, balance)))
                 .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)))
                 .switchIfEmpty(Mono.just(ResponseHandler.response("No Content", HttpStatus.BAD_REQUEST, null)))
-                .doFinally(fin -> log.info("[END] getBalance transaction"));
+                .doFinally(fin -> log.info("[END] getDebt Payment"));
+    }
+
+    @GetMapping("/balance/client/{idClient}")
+    public Mono<ResponseEntity<Object>> getBalanceClient(@PathVariable("idClient") String idClient)
+    {
+        log.info("[INI] getBalanceClient Payment");
+        log.info(idClient);
+
+        return paymentService.getTotalBalanceClient(idClient)
+                .flatMap(balance -> Mono.just(ResponseHandler.response("Done", HttpStatus.OK, balance)))
+                .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)))
+                .switchIfEmpty(Mono.just(ResponseHandler.response("No Content", HttpStatus.BAD_REQUEST, null)))
+                .doFinally(fin -> log.info("[END] getBalanceClient Payment"));
     }
 }

@@ -82,14 +82,11 @@ public class PaymentImpl implements PaymentService
     @Override
     public Mono<Float> getTotalBalanceClient(String idClient)
     {
-        return findAll()
-                .flatMap(payments ->
-                        Mono.just((float)payments.stream()
-                                .filter(payment ->
-                                        (payment.getClientId().equals(idClient))
-                                )
-                                .mapToDouble(Payment::getMont)
-                                .sum()
-                        ));
+        return findByIdClient(idClient).flatMap(payments ->
+            Mono.just((float)payments
+                    .stream()
+                    .mapToDouble(Payment::getMont)
+                    .sum())
+        );
     }
 }
