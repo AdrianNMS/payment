@@ -68,8 +68,8 @@ public class PaymentRestControllerCreate
         mont.setMont(pay.getMont());
 
         return pasiveService.payWithDebitCard(pay.getDebitCardId(),mont)
-                .flatMap(responsePasive -> {
-                    if(responsePasive.getData())
+                .flatMap(responseDebitCard -> {
+                    if(responseDebitCard.getData())
                     {
                         return createPayment(pay, log, paymentService);
                     }

@@ -1,9 +1,8 @@
 package com.bank.payment.services.impl;
 
 import com.bank.payment.models.utils.Mont;
-import com.bank.payment.models.utils.ResponseActive;
+import com.bank.payment.models.utils.ResponseDebitCard;
 import com.bank.payment.models.utils.ResponseMont;
-import com.bank.payment.models.utils.ResponsePasive;
 import com.bank.payment.services.PasiveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,12 +17,12 @@ public class PasiveImpl implements PasiveService
     @Autowired
     WebClient webClient;
     @Override
-    public Mono<ResponsePasive> payWithDebitCard(String idDebitCard, Mont mont) {
+    public Mono<ResponseDebitCard> payWithDebitCard(String idDebitCard, Mont mont) {
         return webClient.put()
                 .uri("/api/active/debitCard/"+ idDebitCard)
                 .body(Mono.just(mont), Mont.class)
                 .retrieve()
-                .bodyToMono(ResponsePasive.class);
+                .bodyToMono(ResponseDebitCard.class);
     }
 
     @Override
