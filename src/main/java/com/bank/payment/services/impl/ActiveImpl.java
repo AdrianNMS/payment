@@ -18,10 +18,10 @@ public class ActiveImpl implements ActiveService {
     WebClient webClient;
 
     @Override
-    public Mono<ResponseActive> findType(Integer type,String id)
+    public Mono<ResponseActive> findType(String id)
     {
         return webClient.get()
-                .uri("/api/active/"+type+"/"+ id)
+                .uri("/api/active/type/"+ id)
                 .retrieve()
                 .bodyToMono(ResponseActive.class);
     }
@@ -30,6 +30,14 @@ public class ActiveImpl implements ActiveService {
     public Mono<ResponseMont> getMont(String idActive, String idCredit) {
         return webClient.get()
                 .uri("/api/active/mont/"+ idActive+"/"+idCredit)
+                .retrieve()
+                .bodyToMono(ResponseMont.class);
+    }
+
+    @Override
+    public Mono<ResponseMont> getMontTran(String idActive, String idCredit) {
+        return webClient.get()
+                .uri("/api/active/tran/"+ idActive+"/"+idCredit)
                 .retrieve()
                 .bodyToMono(ResponseMont.class);
     }

@@ -65,31 +65,28 @@ public class PaymentImpl implements PaymentService
                             .collect(Collectors.toList()))
                 );
     }
-
     @Override
-    public Mono<Float> getBalance(String id, String idCredit) {
+    public Mono<Float> getTotalBalance(String id, String idCredit) {
         LocalDateTime dateNow = LocalDateTime.now();
-        return findAll()
-                .flatMap(payments ->
-                    Mono.just((float)payments.stream()
-                            .filter(payment ->
-                                            payment.getDateRegister().getMonthValue() == dateNow.getMonthValue()
-                                            && payment.getDateRegister().getYear() == dateNow.getYear() &&
-                                            (payment.getActiveId().equals(id) && payment.getCreditId().equals(idCredit))
-                                    )
-                            .mapToDouble(Payment::getMont)
-                            .average()
-                            .getAsDouble()
-                    ));
-    }
-
-    @Override
-    public Mono<Float> getDebt(String id, String idCredit) {
         return findAll()
                 .flatMap(payments ->
                         Mono.just((float)payments.stream()
                                 .filter(payment ->
                                         (payment.getActiveId().equals(id) && payment.getCreditId().equals(idCredit))
+                                )
+                                .mapToDouble(Payment::getMont)
+                                .sum()
+                        ));
+    }
+
+    @Override
+    public Mono<Float> getTotalBalanceClient(String idClient)
+    {
+        return findAll()
+                .flatMap(payments ->
+                        Mono.just((float)payments.stream()
+                                .filter(payment ->
+                                        (payment.getClientId().equals(idClient))
                                 )
                                 .mapToDouble(Payment::getMont)
                                 .sum()

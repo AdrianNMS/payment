@@ -13,7 +13,6 @@ public interface PaymentService
     Mono<Payment> update(String id, Payment pay);
     Mono<Object> delete(String id);
     Mono<List<Payment>> findByIdClient(String id);
-    Mono<Float> getBalance(String id, String idCredit);
-    Mono<Float> getDebt(String id, String idCredit);
-
+    Mono<Float> getTotalBalance(String id, String idCredit);
+    Mono<Float> getTotalBalanceClient(String idClient);
 }

@@ -1,9 +1,6 @@
 package com.bank.payment.controllers;
 
-import com.bank.payment.controllers.helpers.PaymentRestControllerCreate;
-import com.bank.payment.controllers.helpers.PaymentRestControllerUpdate;
 import com.bank.payment.handler.ResponseHandler;
-import com.bank.payment.models.documents.Payment;
 import com.bank.payment.services.ActiveService;
 import com.bank.payment.services.ClientService;
 import com.bank.payment.services.PaymentService;
@@ -14,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -56,23 +51,23 @@ public class PaymentRestController
                 .doFinally(fin -> log.info("[END] find Payment"));
     }
 
-    @PostMapping
+    /*@PostMapping
     public Mono<ResponseEntity<Object>> create(@Valid @RequestBody Payment pay)
     {
         log.info("[INI] create payment");
 
         return PaymentRestControllerCreate.CreatePaymentSequence(pay,log,paymentService,activeService,clientService)
                 .doFinally(fin -> log.info("[END] create Payment"));
-    }
+    }*/
 
-    @PutMapping("/{id}")
+    /*@PutMapping("/{id}")
     public Mono<ResponseEntity<Object>> update(@PathVariable("id") String id, @RequestBody Payment pay)
     {
         log.info("[INI] update Payment");
 
         return PaymentRestControllerUpdate.UpdatePaymentSequence(id,pay,log,paymentService,activeService)
                 .doFinally(fin -> log.info("[END] update Payment"));
-    }
+    }*/
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Object>> delete(@PathVariable("id") String id)
@@ -98,13 +93,13 @@ public class PaymentRestController
                 .doFinally(fin -> log.info("[END] findByIdClient Payment"));
     }
 
-    @GetMapping("/balance/{id}/{idCredit}")
-    public Mono<ResponseEntity<Object>> getBalance(@PathVariable("id") String id, @PathVariable("idCredit") String idCredit)
+    @GetMapping("/debt/{id}/{idCredit}")
+    public Mono<ResponseEntity<Object>> getDebt(@PathVariable("id") String id, @PathVariable("idCredit") String idCredit)
     {
         log.info("[INI] getBalance transaction");
         log.info(id);
 
-        return paymentService.getBalance(id,idCredit)
+        return paymentService.getTotalBalance(id,idCredit)
                 .flatMap(balance -> Mono.just(ResponseHandler.response("Done", HttpStatus.OK, balance)))
                 .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)))
                 .switchIfEmpty(Mono.just(ResponseHandler.response("No Content", HttpStatus.BAD_REQUEST, null)))
