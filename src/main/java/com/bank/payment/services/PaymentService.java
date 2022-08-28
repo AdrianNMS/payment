@@ -1,6 +1,10 @@
 package com.bank.payment.services;
 
+import com.bank.payment.models.documents.MovementRegister;
 import com.bank.payment.models.documents.Payment;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import reactor.core.publisher.Mono;
 
 import java.util.List;

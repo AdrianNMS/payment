@@ -1,6 +1,7 @@
 package com.bank.payment.controllers.helpers;
 
 import com.bank.payment.handler.ResponseHandler;
+import com.bank.payment.models.documents.MovementRegister;
 import com.bank.payment.models.documents.Payment;
 import com.bank.payment.models.enums.TypePayment;
 import com.bank.payment.models.utils.Mont;
@@ -10,13 +11,15 @@ import com.bank.payment.services.PaymentService;
 import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
 public class PaymentRestControllerCreate
 {
-    public static Mono<ResponseEntity<Object>> createPayment(Payment pay, Logger log, PaymentService paymentService)
+    public static Mono<ResponseEntity<Object>> createPayment(Payment pay, Logger log,
+                                                             PaymentService paymentService)
     {
         pay.setDateRegister(LocalDateTime.now());
 
@@ -26,7 +29,8 @@ public class PaymentRestControllerCreate
                 .onErrorResume(error -> Mono.just(ResponseHandler.response(error.getMessage(), HttpStatus.BAD_REQUEST, null)));
     }
 
-    public static Mono<ResponseEntity<Object>> setMontPasive(Payment pay,Logger log, PasiveService pasive, PaymentService paymentService, Mont mont) {
+    public static Mono<ResponseEntity<Object>> setMontPasive(Payment pay,Logger log,
+                                                             PasiveService pasive, PaymentService paymentService, Mont mont) {
         return pasive.setMont(pay.getPasiveId(), mont)
                 .flatMap(responseMont -> {
                     if (responseMont.getStatus().equals("OK"))
@@ -39,7 +43,8 @@ public class PaymentRestControllerCreate
 
 
 
-    public static Mono<ResponseEntity<Object>> getMontPasive(Payment pay,Logger log, PasiveService pasiveService, PaymentService paymentService)
+    public static Mono<ResponseEntity<Object>> getMontPasive(Payment pay,Logger log,
+                                                             PasiveService pasiveService, PaymentService paymentService)
     {
         return pasiveService.getMont(pay.getPasiveId()).flatMap(responseMont -> {
             if (responseMont.getData() != null)
@@ -62,11 +67,14 @@ public class PaymentRestControllerCreate
         });
     }
 
-    public static Mono<ResponseEntity<Object>> payWithDebitCard(Payment pay,Logger log, PasiveService pasiveService, PaymentService paymentService)
+    public static Mono<ResponseEntity<Object>> payWithDebitCard(Payment pay,Logger log,
+                                                                PasiveService pasiveService, PaymentService paymentService,
+                                                                KafkaTemplate<String, MovementRegister> template)
     {
         Mont mont = new Mont();
         mont.setMont(pay.getMont());
 
+        log.info(pay.getDebitCardId());
         log.info(mont.toString());
         log.info("API");
 
@@ -75,6 +83,14 @@ public class PaymentRestControllerCreate
                     log.info(responseDebitCard.toString());
                     if(responseDebitCard.getData())
                     {
+                        var movementRegister = MovementRegister.builder()
+                                .debitCardId(pay.getDebitCardId())
+                                .clientId(pay.getClientId())
+                                .mont(pay.getMont())
+                                .build();
+
+                        template.send("movements",movementRegister);
+
                         return createPayment(pay, log, paymentService);
                     }
                     else
@@ -85,7 +101,9 @@ public class PaymentRestControllerCreate
     }
 
 
-    public static Mono<ResponseEntity<Object>> CheckActiveType(Payment pay, Logger log, PaymentService paymentService, ActiveService activeService, PasiveService pasive)
+    public static Mono<ResponseEntity<Object>> CheckActiveType(Payment pay, Logger log,
+                                                               PaymentService paymentService, ActiveService activeService,
+                                                               PasiveService pasive, KafkaTemplate<String, MovementRegister> template)
     {
         log.info(pay.toString());
         return activeService.findType(pay.getActiveId())
@@ -104,7 +122,7 @@ public class PaymentRestControllerCreate
                         else
                         {
                             log.info("Pago tarjeta debito");
-                            return payWithDebitCard(pay, log, pasive,paymentService);
+                            return payWithDebitCard(pay, log, pasive,paymentService,template);
                         }
 
                     }
@@ -113,9 +131,11 @@ public class PaymentRestControllerCreate
                 });
     }
 
-    public static Mono<ResponseEntity<Object>> CreatePaymentSequence(Payment pay, Logger log, PaymentService paymentService, ActiveService activeService, PasiveService pasive)
+    public static Mono<ResponseEntity<Object>> CreatePaymentSequence(Payment pay, Logger log,
+                                                                     PaymentService paymentService, ActiveService activeService,
+                                                                     PasiveService pasive, KafkaTemplate<String, MovementRegister> template)
     {
-        return CheckActiveType(pay, log, paymentService,activeService, pasive);
+        return CheckActiveType(pay, log, paymentService,activeService, pasive, template);
     }
 
 }

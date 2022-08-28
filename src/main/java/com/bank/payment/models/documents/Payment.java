@@ -32,4 +32,5 @@ public class Payment extends Audit
 
     private String pasiveId;
     private String debitCardId;
+
 }

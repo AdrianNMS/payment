@@ -2,6 +2,7 @@ package com.bank.payment.controllers;
 
 import com.bank.payment.controllers.helpers.PaymentRestControllerCreate;
 import com.bank.payment.handler.ResponseHandler;
+import com.bank.payment.models.documents.MovementRegister;
 import com.bank.payment.models.documents.Payment;
 import com.bank.payment.services.ActiveService;
 import com.bank.payment.services.ClientService;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -35,8 +37,10 @@ public class PaymentRestController
     @Autowired
     private PasiveService pasiveService;
 
-    @GetMapping
+    @Autowired
+    private KafkaTemplate<String, MovementRegister> template;
 
+    @GetMapping
     public Mono<ResponseEntity<Object>> findAll()
     {
         log.info("[INI] findAll Payment");
@@ -63,7 +67,7 @@ public class PaymentRestController
     {
         log.info("[INI] create payment");
 
-        return PaymentRestControllerCreate.CreatePaymentSequence(pay,log,paymentService,activeService,pasiveService)
+        return PaymentRestControllerCreate.CreatePaymentSequence(pay,log,paymentService,activeService,pasiveService,template)
                 .doFinally(fin -> log.info("[END] create Payment"));
     }
 
@@ -116,4 +120,17 @@ public class PaymentRestController
                 .switchIfEmpty(Mono.just(ResponseHandler.response("No Content", HttpStatus.BAD_REQUEST, null)))
                 .doFinally(fin -> log.info("[END] getBalanceClient Payment"));
     }
+
+    @GetMapping("/kafka")
+    public void test()
+    {
+        var movementRegister = MovementRegister.builder()
+                .debitCardId("1")
+                .clientId("1")
+                .mont(1f)
+                .build();
+
+        template.send("movements1",movementRegister);
+    }
+
 }
