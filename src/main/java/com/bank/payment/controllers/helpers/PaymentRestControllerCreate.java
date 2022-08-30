@@ -30,11 +30,24 @@ public class PaymentRestControllerCreate
     }
 
     public static Mono<ResponseEntity<Object>> setMontPasive(Payment pay,Logger log,
-                                                             PasiveService pasive, PaymentService paymentService, Mont mont) {
+                                                             PasiveService pasive, PaymentService paymentService, Mont mont,
+                                                             KafkaTemplate<String, MovementRegister> template) {
         return pasive.setMont(pay.getPasiveId(), mont)
                 .flatMap(responseMont -> {
                     if (responseMont.getStatus().equals("OK"))
+                    {
+                        var movementRegister = MovementRegister.builder()
+                                .pasiveId(pay.getPasiveId())
+                                .clientId(pay.getClientId())
+                                .mont(pay.getMont())
+                                .debitCardId(null)
+                                .build();
+
+                        template.send("movements",movementRegister);
+
+
                         return createPayment(pay, log, paymentService);
+                    }
                     else
                         return Mono.just(ResponseHandler.response("Error", HttpStatus.BAD_REQUEST, null));
 
@@ -44,7 +57,8 @@ public class PaymentRestControllerCreate
 
 
     public static Mono<ResponseEntity<Object>> getMontPasive(Payment pay,Logger log,
-                                                             PasiveService pasiveService, PaymentService paymentService)
+                                                             PasiveService pasiveService, PaymentService paymentService,
+                                                             KafkaTemplate<String, MovementRegister> template)
     {
         return pasiveService.getMont(pay.getPasiveId()).flatMap(responseMont -> {
             if (responseMont.getData() != null)
@@ -56,7 +70,7 @@ public class PaymentRestControllerCreate
                     Mont mont = new Mont();
                     mont.setMont(-pay.getMont());
                     log.info(mont.toString());
-                    return setMontPasive(pay,log,pasiveService,paymentService,mont);
+                    return setMontPasive(pay,log,pasiveService,paymentService,mont,template);
                 }
                 else
                     return Mono.just(ResponseHandler.response("You don't have enough credit", HttpStatus.BAD_REQUEST, null));
@@ -85,6 +99,7 @@ public class PaymentRestControllerCreate
                     {
                         var movementRegister = MovementRegister.builder()
                                 .debitCardId(pay.getDebitCardId())
+                                .pasiveId(null)
                                 .clientId(pay.getClientId())
                                 .mont(pay.getMont())
                                 .build();
@@ -117,7 +132,7 @@ public class PaymentRestControllerCreate
                         if(pay.getDebitCardId()==null || pay.getDebitCardId().isEmpty())
                         {
                             log.info("Pago pasivo");
-                            return getMontPasive(pay, log, pasive,paymentService);
+                            return getMontPasive(pay, log, pasive,paymentService,template);
                         }
                         else
                         {
